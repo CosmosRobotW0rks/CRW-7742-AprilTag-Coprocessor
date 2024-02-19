@@ -105,7 +105,7 @@ class UDP_Sender:
         self.port.sendto(bytes(data, "utf-8"), (self.remote, self.portnum))
 
 
-marker_size = 0.005 # Meters
+marker_size = 0.05 # Meters
 vc = cv2.VideoCapture(0)
 
 if not vc.isOpened():
@@ -125,7 +125,7 @@ board = aruco.GridBoard(
 aruco_detector = aruco.ArucoDetector(dictionary=aruco_dict)
 
 detector = Detector(aruco_detector, cam_matrix, cam_coeff, marker_size)
-sender = UDP_Sender("10.77.42.2", 11753)
+sender = UDP_Sender("10.77.42.2", 5801)
 rate = 30
 
 writer = cv2.VideoWriter(
@@ -155,6 +155,7 @@ if __name__ == "__main__":
                 1,
             )
             writer.write(resized)
+            cv2.imshow("video", resized)
 
             data_str = detector.get_data_string()
             if data_str == None or data_str == "":
@@ -168,6 +169,9 @@ if __name__ == "__main__":
             delta_ns = end_ns - start_ns
             wait_sec = max((rate_ns - delta_ns) / 1000000000, 0)
             time.sleep(wait_sec)
+
+            if cv2.waitKey(1) == ord("q"):
+                break
     finally:
         print("Stopping!")
 
